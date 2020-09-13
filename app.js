@@ -78,6 +78,7 @@ app.get('/logout', function(req,res){
     res.redirect('/');
 })
 
+//always has these three variables. inside can be anything but returns next as a function if true
 function isLoggedIn(req,res,next){
     if(req.isAuthenticated()){
         return next();
