@@ -16,6 +16,7 @@ app.use(require('express-session')({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(bodyParser.urlencoded({extended:true}));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
@@ -27,12 +28,37 @@ mongoose.connect('mongodb://localhost:27017/auth', {
     .then(() => console.log('Connected to DB!'))
     .catch(error => console.log(error.message));
 
+
+
+//==============================
+// ROUTES
+//==============================
+
 app.get('/', function(req,res){
     res.render('home');
 });
 
 app.get('/secret', function(req,res){
     res.render('secret');
+});
+
+// auth routes
+
+app.get('/register', function(req,res){
+    res.render('register');
+});
+
+app.post('/register', function(req,res){
+    User.register(new User({username: req.body.username}), req.body.password, function(err, user){
+        if(err){
+            console.log(err);
+            res.redirect('/register');
+        } else {
+            passport.authenticate("local")(req,res,function(){
+                res.redirect('/secret');
+            })
+        }
+    })
 });
 
 app.listen(3000,'localhost', function(){
